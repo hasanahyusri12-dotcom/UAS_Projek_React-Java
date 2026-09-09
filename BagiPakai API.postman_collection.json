@@ -1,0 +1,717 @@
+{
+	"info": {
+		"_postman_id": "edcbb353-ce95-4238-a564-a7c67e12ce69",
+		"name": "BagiPakai REST API - Proyek Akhir",
+		"description": "Koleksi Postman REST API Lengkap untuk Aplikasi BagiPakai (Spring Boot + React)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01. Autentikasi",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"Albian\",\n  \"email\": \"albian@example.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"Albian Maulana\",\n  \"phoneNumber\": \"081234567890\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"Albian\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02. Items (CRUD, Search & Sorting)",
+			"item": [
+				{
+					"name": "1. Get All Items (Pagination)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/items?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items"],
+							"query": [
+								{ "key": "page", "value": "0" },
+								{ "key": "size", "value": "10" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Search Items (Keyword Backend)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/items?q=rak",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items"],
+							"query": [
+								{ "key": "q", "value": "rak" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Sorting Items - Ascending",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/items?sort=namaBarang&direction=asc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items"],
+							"query": [
+								{ "key": "sort", "value": "namaBarang" },
+								{ "key": "direction", "value": "asc" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Sorting Items - Descending",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/items?sort=id&direction=desc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items"],
+							"query": [
+								{ "key": "sort", "value": "id" },
+								{ "key": "direction", "value": "desc" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Filter Items by Kategori & Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/items?kategori=Furniture&status=TERSEDIA",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items"],
+							"query": [
+								{ "key": "kategori", "value": "Furniture" },
+								{ "key": "status", "value": "TERSEDIA" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. Get Detail Item by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/items/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. Get My Items (Barang Milik Saya)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/items/mine",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items", "mine"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. Create Item (Tambah Barang)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"namaBarang\": \"Rak Buku Kayu Jati Minimalis\",\n  \"deskripsi\": \"Kondisi sangat mulus 95%, masih sangat kokoh dan siap pakai.\",\n  \"kategori\": \"Furniture\",\n  \"lokasi\": \"Jakarta Selatan\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. Update Item (Ubah Data Barang)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"namaBarang\": \"Rak Buku Kayu Jati Minimalis (Updated)\",\n  \"deskripsi\": \"Kondisi sangat mulus 98%, siap diambil di lokasi.\",\n  \"kategori\": \"Furniture\",\n  \"lokasi\": \"Jakarta Selatan\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/items/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "10. Upload Foto Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/items/1/foto",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items", "1", "foto"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11. Delete Item (Hapus Barang)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/items/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "items", "1"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03. User Profile",
+			"item": [
+				{
+					"name": "Get Profile Saya (/me)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "me"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile Saya",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Albian Maulana\",\n  \"phoneNumber\": \"081234567890\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "me"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "04. Claims (Pengajuan Barang)",
+			"item": [
+				{
+					"name": "Ajukan Claim Barang",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"alasan\": \"Saya membutuhkan meja ini untuk keperluan belajar di rumah.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/claims/items/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "claims", "items", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Permintaan Claim Saya",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/claims/my-requests",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "claims", "my-requests"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Permintaan Claim Masuk (Owner)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/claims/incoming",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "claims", "incoming"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Terima Claim (Owner)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/claims/1/accept",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "claims", "1", "accept"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tolak Claim (Owner)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/claims/1/reject",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "claims", "1", "reject"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "05. Transaksi",
+			"item": [
+				{
+					"name": "Get Daftar Transaksi Saya",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/transactions",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "transactions"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Detail Transaksi by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/transactions/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "transactions", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Konfirmasi Transaksi Selesai",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/transactions/1/confirm",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "transactions", "1", "confirm"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "06. Chat & Pesan",
+			"item": [
+				{
+					"name": "Get Daftar Percakapan",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conversations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conversations"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pesan dalam Percakapan",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conversations/1/messages",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conversations", "1", "messages"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Kirim Pesan Chat",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Halo, apakah barang ini masih bisa diambil besok siang?\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/conversations/1/messages",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conversations", "1", "messages"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "07. Notifikasi",
+			"item": [
+				{
+					"name": "Get Daftar Notifikasi",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tandai 1 Notifikasi Dibaca",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/1/read",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications", "1", "read"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tandai Semua Notifikasi Dibaca",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/read-all",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications", "read-all"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "08. Admin Moderasi",
+			"item": [
+				{
+					"name": "Get Admin Dashboard Stats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "dashboard"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Semua Items (Admin View)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "items"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Item (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/items/1/approve",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "items", "1", "approve"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Item (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/items/1/reject",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "items", "1", "reject"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "users"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle User Status (Aktif/Nonaktif)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users/1/toggle-status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "users", "1", "toggle-status"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

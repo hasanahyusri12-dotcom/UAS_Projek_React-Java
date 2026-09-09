@@ -1,0 +1,84 @@
+# ==========================================
+# Root .gitignore - Projek BagiPakai
+# ==========================================
+
+# ------------------------------------------
+# Frontend (Node.js / React / Vite)
+# ------------------------------------------
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
+*.local
+.env
+.env.*
+!.env.example
+.eslintcache
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------
+# Backend (Java / Spring Boot / Maven)
+# ------------------------------------------
+target/
+**/target/
+build/
+**/build/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+.mvn/wrapper/maven-wrapper.jar
+
+# Uploaded files at runtime
+uploads/
+**/uploads/
+!**/uploads/.gitkeep
+
+# STS / Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# ------------------------------------------
+# IDE & Code Editors
+# ------------------------------------------
+.vscode/
+**/.vscode/
+!.vscode/extensions.json
+.idea/
+**/.idea/
+*.iml
+*.iws
+*.ipr
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ------------------------------------------
+# Operating System Files
+# ------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini

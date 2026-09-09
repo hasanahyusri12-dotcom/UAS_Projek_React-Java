@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Deep Blue Palette (Primary Brand - #2B4E86) */
+  --color-deepblue-50: #F0F5FD;
+  --color-deepblue-100: #E1ECFC;
+  --color-deepblue-200: #C7DEFA;
+  --color-deepblue-300: #A5CBFD;
+  --color-deepblue-400: #6EA3F5;
+  --color-deepblue-500: #427DE8;
+  --color-deepblue-600: #2B4E86;
+  --color-deepblue-700: #223F6E;
+  --color-deepblue-800: #1B3156;
+  --color-deepblue-900: #15253F;
+  --color-deepblue-950: #0E182A;
+
+  /* Primary Alias mapped to Deep Blue */
+  --color-primary-50: #F0F5FD;
+  --color-primary-100: #E1ECFC;
+  --color-primary-200: #C7DEFA;
+  --color-primary-300: #A5CBFD;
+  --color-primary-400: #6EA3F5;
+  --color-primary-500: #427DE8;
+  --color-primary-600: #2B4E86;
+  --color-primary-700: #223F6E;
+  --color-primary-800: #1B3156;
+  --color-primary-900: #15253F;
+  --color-primary-950: #0E182A;
+
+  /* Amber / Orange Palette (Action & CTA - #E08500) */
+  --color-amber-50: #FFF9F0;
+  --color-amber-100: #FEF0DA;
+  --color-amber-200: #FCDFB5;
+  --color-amber-300: #FAC780;
+  --color-amber-400: #F5A53B;
+  --color-amber-500: #E08500;
+  --color-amber-600: #C47000;
+  --color-amber-700: #9C5402;
+  --color-amber-800: #7D4208;
+  --color-amber-900: #65360B;
+  --color-amber-950: #381C03;
+
+  /* Action Alias mapped to Amber / Orange */
+  --color-action-50: #FFF9F0;
+  --color-action-100: #FEF0DA;
+  --color-action-200: #FCDFB5;
+  --color-action-300: #FAC780;
+  --color-action-400: #F5A53B;
+  --color-action-500: #E08500;
+  --color-action-600: #C47000;
+  --color-action-700: #9C5402;
+  --color-action-800: #7D4208;
+  --color-action-900: #65360B;
+
+  /* Light Blue Palette (Background, Card, Hover - #A5CBFD) */
+  --color-lightblue-50: #F4F8FE;
+  --color-lightblue-100: #E8F2FE;
+  --color-lightblue-200: #CFE4FD;
+  --color-lightblue-300: #A5CBFD;
+  --color-lightblue-400: #79B0FB;
+  --color-lightblue-500: #4B90F7;
+  --color-lightblue-600: #2871E4;
+
+  /* Backward Compatibility Aliases for Sage -> Mapped to Deep Blue Theme */
+  --color-sage-50: #F0F5FD;
+  --color-sage-100: #E1ECFC;
+  --color-sage-200: #CFE4FD;
+  --color-sage-300: #A5CBFD;
+  --color-sage-400: #6EA3F5;
+  --color-sage-500: #427DE8;
+  --color-sage-600: #2B4E86;
+  --color-sage-700: #223F6E;
+  --color-sage-800: #1B3156;
+  --color-sage-900: #15253F;
+  --color-sage-950: #0E182A;
+
+  /* Backward Compatibility Aliases for Petrol -> Mapped to Deep Blue / Dark Slate */
+  --color-petrol-50: #F0F5FD;
+  --color-petrol-100: #E1ECFC;
+  --color-petrol-200: #C7DEFA;
+  --color-petrol-300: #8DB8EC;
+  --color-petrol-400: #5B94E0;
+  --color-petrol-500: #3975C7;
+  --color-petrol-600: #2B4E86;
+  --color-petrol-700: #223F6E;
+  --color-petrol-800: #1B3156;
+  --color-petrol-900: #15253F;
+  --color-petrol-950: #0E182A;
+
+  /* Backward Compatibility Aliases for Ocean */
+  --color-ocean-50: #F0F5FD;
+  --color-ocean-100: #E1ECFC;
+  --color-ocean-200: #CFE4FD;
+  --color-ocean-300: #A5CBFD;
+  --color-ocean-400: #6EA3F5;
+  --color-ocean-500: #3975C7;
+  --color-ocean-600: #2B4E86;
+  --color-ocean-700: #223F6E;
+  --color-ocean-800: #1B3156;
+  --color-ocean-900: #15253F;
+  --color-ocean-950: #0E182A;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    color: #29354A;
+    background-color: #F7F9FC;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F0F5FD;
+}
+::-webkit-scrollbar-thumb {
+  background: #C7DEFA;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8DB8EC;
+}
+
+/* Hide scrollbar for tabs/pills */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glassmorphism & Modern Design Elements */
+.glass-card {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(165, 203, 253, 0.6);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(207, 228, 253, 0.8);
+}
+
+.gradient-hero-vibrant {
+  background: radial-gradient(circle at 10% 15%, rgba(43, 78, 134, 0.10) 0%, transparent 45%),
+              radial-gradient(circle at 90% 10%, rgba(224, 133, 0, 0.12) 0%, transparent 45%),
+              radial-gradient(circle at 50% 80%, rgba(165, 203, 253, 0.35) 0%, transparent 55%),
+              #F7F9FC;
+}
+
+.gradient-deepblue-amber {
+  background: linear-gradient(135deg, #2B4E86 0%, #E08500 100%);
+}
+
+.gradient-card-blue {
+  background: linear-gradient(135deg, #F0F5FD 0%, #E1ECFC 100%);
+}
+
+.gradient-card-amber {
+  background: linear-gradient(135deg, #FFF9F0 0%, #FEF0DA 100%);
+}
+
+.gradient-card-lightblue {
+  background: linear-gradient(135deg, #F4F8FE 0%, #E8F2FE 100%);
+}
+
+/* Hover Lift Effect */
+.hover-lift {
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(43, 78, 134, 0.16), 0 8px 16px -6px rgba(224, 133, 0, 0.10);
+}
+
+.hover-glow {
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-glow:hover {
+  box-shadow: 0 12px 28px -6px rgba(43, 78, 134, 0.18);
+}
