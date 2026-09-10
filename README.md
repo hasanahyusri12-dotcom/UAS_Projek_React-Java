@@ -3,7 +3,7 @@
 > Proyek Akhir Pelatihan Full-Stack Web Development: React JS & Java Spring Boot
 
 **Peserta:** Albian Maulana
-**Repo:** [GitHub Repository Link](https://github.com/USERNAME/REPO_NAME)
+**Repo:** [github.com/hasanahyusri12-dotcom/UAS_Projek_React-Java](https://github.com/hasanahyusri12-dotcom/UAS_Projek_React-Java)
 
 ---
 
@@ -40,7 +40,7 @@ BagiPakai adalah platform buat nyalurin barang bekas yang masih layak pakai (fur
 Projek_React Java_BagiPakai/
 ├── README.md
 ├── BagiPakai API.postman_collection.json
-├── dump-bagigunapakai-202609091236.sql
+├── dump-bagigunapakai-202609100842.sql
 ├── Backend/bagigunapakai/          # Spring Boot
 │   └── src/main/java/com/bagipakai/bagigunapakai/
 │       ├── config/ controller/ dto/ entity/
@@ -60,16 +60,40 @@ Projek_React Java_BagiPakai/
 CREATE DATABASE bagigunapakai;
 ```
 ```bash
-mysql -u root -p bagigunapakai < dump-bagigunapakai-202609091236.sql
+mysql -u root -p bagigunapakai < dump-bagigunapakai-202609100842.sql
 ```
 
-Lalu sesuaikan `Backend/bagigunapakai/src/main/resources/application.properties`:
+Konfigurasi koneksi database (`application.properties`) sudah diambil dari environment
+variable, jadi **tidak perlu edit file `application.properties` secara langsung**. Cukup
+salin `.env.example` di root jadi `.env`, lalu sesuaikan nilainya:
 
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/bagigunapakai?useSSL=false&serverTimezone=UTC
-spring.datasource.username=root
-spring.datasource.password=
+```bash
+cp .env.example .env        # Windows: copy .env.example .env
 ```
+
+```env
+DB_USERNAME=root
+DB_PASSWORD=isi_password_mysql_kamu
+```
+
+Lalu export variabel tersebut sebelum menjalankan backend (Linux/macOS):
+
+```bash
+export DB_USERNAME=root
+export DB_PASSWORD=isi_password_mysql_kamu
+```
+
+Windows (PowerShell):
+
+```powershell
+$env:DB_USERNAME="root"
+$env:DB_PASSWORD="isi_password_mysql_kamu"
+```
+
+> Kalau `DB_USERNAME`/`DB_PASSWORD` tidak di-set, aplikasi tetap jalan dengan default
+> `root` tanpa password (cocok untuk MySQL lokal tanpa password). Untuk `JWT_SECRET`
+> juga berlaku sama — ada default untuk kebutuhan development, tapi untuk penggunaan
+> di luar lokal sebaiknya di-override lewat environment variable `JWT_SECRET` sendiri.
 
 ---
 

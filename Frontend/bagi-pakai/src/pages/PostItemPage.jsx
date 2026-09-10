@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   UploadCloud,
@@ -8,10 +8,11 @@ import {
   MapPin,
   Lock,
   Info,
-  Gift,
+  Sparkles,
 } from 'lucide-react';
 import { itemsApi } from '../api/itemsApi';
 import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 import { CATEGORIES } from '../components/items/CategoryPills';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
@@ -19,6 +20,7 @@ import { Badge } from '../components/common/Badge';
 export const PostItemPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const { confirm } = useConfirm();
 
   const [formData, setFormData] = useState({
     namaBarang: '',
@@ -55,6 +57,9 @@ export const PostItemPage = () => {
   };
 
   const removePhoto = () => {
+    if (photoPreview) {
+      URL.revokeObjectURL(photoPreview);
+    }
     setPhotoFile(null);
     setPhotoPreview(null);
   };
@@ -75,6 +80,17 @@ export const PostItemPage = () => {
       setError('Deskripsi kondisi barang wajib diisi.');
       return;
     }
+
+    const isConfirmed = await confirm({
+      title: 'Terbitkan Barang Ini?',
+      message: `Apakah data barang "${formData.namaBarang.trim()}" sudah sesuai? Barang akan langsung ditinjau oleh admin untuk dipublikasikan secara gratis.`,
+      confirmText: 'Ya, Terbitkan Sekarang',
+      cancelText: 'Periksa Kembali',
+      variant: 'primary',
+      icon: <Sparkles className="w-6 h-6 text-[#2B4E86]" />,
+    });
+
+    if (!isConfirmed) return;
 
     try {
       setLoading(true);
@@ -114,12 +130,12 @@ export const PostItemPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
       {/* Header */}
       <div>
         <Link
           to="/my-items"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-sage-800 transition-colors mb-2"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#2B4E86] transition-colors mb-2"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Kembali ke Dashboard</span>
@@ -139,17 +155,17 @@ export const PostItemPage = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
         {/* LANGKAH 1: FOTO & KONDISI */}
-        <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border-2 border-sage-100 shadow-sm space-y-6">
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-2 border-[#CFE4FD] shadow-sm space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-xl bg-sage-700 text-white flex items-center justify-center text-xs font-bold">
+              <span className="w-7 h-7 rounded-xl bg-[#2B4E86] text-white flex items-center justify-center text-xs font-bold">
                 1
               </span>
               <span>Foto & Kondisi Barang</span>
             </h2>
-            <Badge variant="sage" size="sm">
+            <Badge variant="primary" size="sm">
               Wajib Foto Jelas
             </Badge>
           </div>
@@ -157,7 +173,7 @@ export const PostItemPage = () => {
           {/* Photo Upload Area */}
           <div>
             {photoPreview ? (
-              <div className="relative max-w-sm mx-auto aspect-[4/3] rounded-3xl overflow-hidden border-2 border-sage-300 shadow-sm group">
+              <div className="relative max-w-sm mx-auto aspect-[4/3] rounded-3xl overflow-hidden border-2 border-[#A5CBFD] shadow-md group">
                 <img
                   src={photoPreview}
                   alt="Preview Barang"
@@ -172,14 +188,14 @@ export const PostItemPage = () => {
                 </button>
               </div>
             ) : (
-              <label className="border-2 border-dashed border-sage-300 hover:border-sage-500 rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all bg-sage-50/40 hover:bg-sage-50/80 group">
-                <div className="w-16 h-16 rounded-2xl bg-white shadow-xs flex items-center justify-center text-sage-700 group-hover:scale-110 transition-transform mb-3 border border-sage-200">
+              <label className="border-2 border-dashed border-[#A5CBFD] hover:border-[#2B4E86] rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center cursor-pointer transition-all bg-[#F0F5FD]/50 hover:bg-[#F0F5FD] group">
+                <div className="w-16 h-16 rounded-2xl bg-white shadow-xs flex items-center justify-center text-[#2B4E86] group-hover:scale-110 transition-transform mb-3 border border-[#CFE4FD]">
                   <UploadCloud className="w-8 h-8" />
                 </div>
-                <p className="text-sm font-black text-slate-900">
+                <p className="text-sm font-black text-slate-900 text-center">
                   Pilih atau seret foto barang ke sini
                 </p>
-                <p className="text-xs text-slate-500 mt-1 font-medium">Format JPG, PNG, WebP (Maksimal 5MB)</p>
+                <p className="text-xs text-slate-500 mt-1 font-medium text-center">Format JPG, PNG, WebP (Maksimal 5MB)</p>
                 <input
                   type="file"
                   accept="image/*"
@@ -203,8 +219,8 @@ export const PostItemPage = () => {
                   onClick={() => setFormData({ ...formData, kondisi: opt.id })}
                   className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer ${
                     formData.kondisi === opt.id
-                      ? 'bg-sage-50 border-sage-700 shadow-xs'
-                      : 'border-slate-200 hover:border-sage-300 bg-white'
+                      ? 'bg-[#E8F2FE] border-[#2B4E86] shadow-xs'
+                      : 'border-slate-200 hover:border-[#A5CBFD] bg-white'
                   }`}
                 >
                   <div className="font-extrabold text-xs sm:text-sm text-slate-900">{opt.label}</div>
@@ -216,17 +232,17 @@ export const PostItemPage = () => {
         </div>
 
         {/* LANGKAH 2: INFORMASI & DESKRIPSI */}
-        <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border-2 border-sage-100 shadow-sm space-y-6">
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-2 border-[#CFE4FD] shadow-sm space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-xl bg-petrol-700 text-white flex items-center justify-center text-xs font-bold">
+              <span className="w-7 h-7 rounded-xl bg-[#2B4E86] text-white flex items-center justify-center text-xs font-bold">
                 2
               </span>
               <span>Informasi Detail Barang</span>
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             <div className="sm:col-span-2">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                 Nama Barang <span className="text-rose-500">*</span>
@@ -236,7 +252,7 @@ export const PostItemPage = () => {
                 value={formData.namaBarang}
                 onChange={(e) => setFormData({ ...formData, namaBarang: e.target.value })}
                 placeholder="Contoh: Kemeja Flanel Uniqlo Size L / Novel Harry Potter Lengkap"
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 font-semibold"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 font-semibold"
                 required
               />
             </div>
@@ -248,7 +264,7 @@ export const PostItemPage = () => {
               <select
                 value={formData.kategori}
                 onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 bg-white font-bold cursor-pointer"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 bg-white font-bold cursor-pointer"
               >
                 {CATEGORIES.filter((c) => c.id).map((cat) => (
                   <option key={cat.id} value={cat.id}>
@@ -267,7 +283,7 @@ export const PostItemPage = () => {
                 value={formData.deskripsi}
                 onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
                 placeholder="Ceritakan spesifikasi barang, ukuran, minus atau kelebihan, dan alasan membagikannya..."
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 font-medium resize-none"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 font-medium resize-none"
                 required
               />
             </div>
@@ -275,28 +291,28 @@ export const PostItemPage = () => {
         </div>
 
         {/* LANGKAH 3: PENGATURAN LOKASI & PRIVASI ALAMAT */}
-        <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border-2 border-sage-100 shadow-sm space-y-6">
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-2 border-[#CFE4FD] shadow-sm space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs font-bold">
+              <span className="w-7 h-7 rounded-xl bg-[#E08500] text-white flex items-center justify-center text-xs font-bold">
                 3
               </span>
               <span>Lokasi & Pengaturan Serah Terima</span>
             </h2>
-            <Badge variant="petrol" size="sm">
+            <Badge variant="primary" size="sm">
               <Lock className="w-3 h-3" /> Privasi Aman
             </Badge>
           </div>
 
-          <div className="bg-petrol-50 rounded-2xl p-4 border-2 border-petrol-200 text-xs text-slate-700 flex items-start gap-3">
-            <Info className="w-5 h-5 text-petrol-700 shrink-0 mt-0.5" />
+          <div className="bg-[#F0F5FD] rounded-2xl p-4 border-2 border-[#CFE4FD] text-xs text-slate-700 flex items-start gap-3">
+            <Info className="w-5 h-5 text-[#2B4E86] shrink-0 mt-0.5" />
             <p className="leading-relaxed font-medium">
               <strong>Privasi Alamat Donatur:</strong> Area publik (Kota/Kecamatan) ditampilkan pada katalog publik.
               Alamat detail penjemputan/patokan tidak akan dipublikasikan dan hanya diberikan kepada penerima yang kamu setujui.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {/* Area Publik */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
@@ -309,7 +325,7 @@ export const PostItemPage = () => {
                   value={formData.areaPublik}
                   onChange={(e) => setFormData({ ...formData, areaPublik: e.target.value })}
                   placeholder="Contoh: Kebayoran Baru, Jakarta Selatan"
-                  className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 font-semibold"
+                  className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 font-semibold"
                   required
                 />
               </div>
@@ -325,7 +341,7 @@ export const PostItemPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, metodeSerahTerima: e.target.value })
                 }
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 bg-white font-bold cursor-pointer"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 bg-white font-bold cursor-pointer"
               >
                 <option value="Keduanya (COD / Ekspedisi)">
                   🔄 Keduanya (Ambil Sendiri / Kirim Ekspedisi)
@@ -343,7 +359,7 @@ export const PostItemPage = () => {
             <div className="sm:col-span-2">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
                 <span>Alamat / Patokan Penjemputan Privat (Opsional)</span>
-                <span className="text-[10px] text-petrol-700 font-bold">
+                <span className="text-[10px] text-[#2B4E86] font-bold">
                   🔒 Hanya untuk Penerima Terpilih
                 </span>
               </label>
@@ -352,14 +368,14 @@ export const PostItemPage = () => {
                 value={formData.alamatPrivat}
                 onChange={(e) => setFormData({ ...formData, alamatPrivat: e.target.value })}
                 placeholder="Contoh: Jl. Ahmad Dahlan No. 12 (Dekat Indomaret simpang empat)..."
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 font-medium"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 font-medium"
               />
             </div>
           </div>
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4">
           <Button
             variant="ghost"
             size="lg"
@@ -370,10 +386,10 @@ export const PostItemPage = () => {
           </Button>
           <Button
             type="submit"
-            variant="gradient"
+            variant="action"
             size="lg"
             isLoading={loading}
-            className="shadow-md shadow-sage-950/15 font-extrabold"
+            className="font-extrabold shadow-md shadow-[#E08500]/20"
           >
             + Terbitkan Barang Sekarang
           </Button>

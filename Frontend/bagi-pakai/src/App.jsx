@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { ConfirmProvider } from './context/ConfirmContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
@@ -28,9 +29,10 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
-          <NotificationProvider>
-            <div className="flex flex-col min-h-screen gradient-hero-vibrant pb-14 sm:pb-0">
-              <Navbar />
+          <ConfirmProvider>
+            <NotificationProvider>
+              <div className="flex flex-col min-h-screen gradient-hero-vibrant pb-24 sm:pb-0">
+                <Navbar />
               <main className="flex-1">
                 <Routes>
                   {/* Public Routes */}
@@ -117,8 +119,9 @@ function App() {
               <BottomNav />
             </div>
           </NotificationProvider>
-        </ToastProvider>
-      </AuthProvider>
+        </ConfirmProvider>
+      </ToastProvider>
+    </AuthProvider>
     </BrowserRouter>
   );
 }

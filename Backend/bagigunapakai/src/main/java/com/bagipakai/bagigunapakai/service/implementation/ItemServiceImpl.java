@@ -396,10 +396,9 @@ public class ItemServiceImpl implements ItemService {
                 StandardCopyOption.REPLACE_EXISTING
         );
 
-        item.setFotoUrl(
-                "/uploads/" + newFilename
-        );
-
+item.setFotoUrl(
+        "/uploads/items/" + newFilename
+);
         return itemRepository.save(item);
     }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRightLeft,
@@ -10,43 +10,69 @@ import {
 import { transactionsApi } from '../api/transactionsApi';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { Spinner } from '../components/common/Loading';
 import { EmptyState } from '../components/common/EmptyState';
+import { getImageUrl } from '../utils/imageUrl';
 
 export const TransactionsPage = () => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+
   const toast = useToast();
+  const { confirm } = useConfirm();
   const navigate = useNavigate();
 
-  const loadTransactions = async () => {
-    try {
-      setLoading(true);
-      const data = await transactionsApi.getMyTransactions();
-      setTransactions(data || []);
-    } catch (err) {
-      toast.error('Gagal memuat transaksi serah terima.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadTransactions();
-  }, []);
+    let cancelled = false;
 
-  const handleMarkReceived = async (txId) => {
-    if (!window.confirm('Tandai bahwa kamu sudah menerima fisik barang ini?')) return;
+    (async () => {
+      try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setLoading(true);
+        const data = await transactionsApi.getMyTransactions();
+        if (!cancelled) {
+          setTransactions(data || []);
+        }
+      } catch {
+        if (!cancelled) {
+          toast.error('Gagal memuat transaksi serah terima.');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [toast]);
+
+  const handleMarkReceived = async (tx) => {
+    const isOk = await confirm({
+      title: 'Konfirmasi Penerimaan Barang?',
+      message: `Tandai bahwa kamu sudah menerima fisik barang "${tx.item?.namaBarang || 'ini'}" dari donatur?`,
+      confirmText: 'Ya, Sudah Diterima',
+      cancelText: 'Batal',
+      variant: 'primary',
+      icon: <Truck className="w-6 h-6 text-[#2B4E86]" />,
+    });
+
+    if (!isOk) return;
 
     try {
       setActionLoading(true);
-      await transactionsApi.markAsReceived(txId);
+      await transactionsApi.markAsReceived(tx.id);
       toast.success('Status berhasil diperbarui! Barang telah diterima. 📦');
-      loadTransactions();
+      // Reload data
+      const data = await transactionsApi.getMyTransactions();
+      setTransactions(data || []);
     } catch (err) {
       toast.error(err.message || 'Gagal memperbarui status.');
     } finally {
@@ -54,14 +80,25 @@ export const TransactionsPage = () => {
     }
   };
 
-  const handleConfirmCompletion = async (txId) => {
-    if (!window.confirm('Konfirmasi bahwa serah terima barang ini telah selesai sempurna?')) return;
+  const handleConfirmCompletion = async (tx) => {
+    const isOk = await confirm({
+      title: 'Selesaikan Serah Terima?',
+      message: `Konfirmasi bahwa serah terima barang "${tx.item?.namaBarang || 'ini'}" telah selesai dengan sempurna?`,
+      confirmText: 'Ya, Selesaikan Transaksi',
+      cancelText: 'Batal',
+      variant: 'success',
+      icon: <CheckCircle2 className="w-6 h-6 text-emerald-600" />,
+    });
+
+    if (!isOk) return;
 
     try {
       setActionLoading(true);
-      await transactionsApi.confirmCompletion(txId);
+      await transactionsApi.confirmCompletion(tx.id);
       toast.success('Serah terima selesai! Terima kasih telah berbagi kebaikan. 🎉🌱');
-      loadTransactions();
+      // Reload data
+      const data = await transactionsApi.getMyTransactions();
+      setTransactions(data || []);
     } catch (err) {
       toast.error(err.message || 'Gagal menyelesaikan transaksi.');
     } finally {
@@ -70,11 +107,11 @@ export const TransactionsPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="bg-gradient-to-r from-sage-50 via-white to-petrol-50 p-6 sm:p-8 rounded-[2.5rem] border-2 border-sage-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-[#F0F5FD] via-white to-[#E8F2FE] p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-[#CFE4FD] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-petrol-100 text-petrol-900 text-xs font-extrabold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E8F2FE] text-[#2B4E86] text-xs font-extrabold mb-2 border border-[#CFE4FD]">
             <ArrowRightLeft className="w-3.5 h-3.5" />
             <span>Alur Serah Terima Barang</span>
           </div>
@@ -91,7 +128,7 @@ export const TransactionsPage = () => {
         <Spinner text="Memuat riwayat serah terima..." />
       ) : transactions.length === 0 ? (
         <EmptyState
-          icon={<ArrowRightLeft className="w-10 h-10 text-petrol-700" />}
+          icon={<ArrowRightLeft className="w-10 h-10 text-[#2B4E86]" />}
           title="Belum Ada Transaksi Serah Terima"
           description="Transaksi serah terima akan otomatis muncul ketika donatur menyetujui pengajuan klaim suatu barang."
           actionText="Jelajah Barang Sekarang"
@@ -111,14 +148,25 @@ export const TransactionsPage = () => {
             return (
               <div
                 key={tx.id}
-                className="bg-white rounded-[2.5rem] p-6 sm:p-8 border-2 border-sage-100 shadow-xs space-y-6 hover:border-sage-300 transition-all"
+                className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border-2 border-[#CFE4FD] shadow-xs space-y-6 hover:border-[#2B4E86] transition-all"
               >
                 {/* Header info */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                   <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sage-700 to-petrol-700 text-white flex items-center justify-center shrink-0 shadow-xs">
-                      <Package className="w-6 h-6" />
-                    </div>
+                    {tx.item?.fotoUrl ? (
+                      <img
+                        src={getImageUrl(tx.item.fotoUrl)}
+                        alt={tx.item.namaBarang}
+                        className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shrink-0 shadow-xs"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#2B4E86] to-[#15253F] text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <Package className="w-6 h-6" />
+                      </div>
+                    )}
                     <div>
                       <h3 className="font-black text-slate-900 text-lg">
                         {tx.item?.namaBarang || 'Barang Serah Terima'}
@@ -126,11 +174,11 @@ export const TransactionsPage = () => {
                       <div className="text-xs text-slate-500 font-semibold">
                         {isGiver ? (
                           <span>
-                            Kamu sebagai <strong className="text-sage-800 font-extrabold">Pemberi</strong> ke @{tx.receiver?.username}
+                            Kamu sebagai <strong className="text-[#2B4E86] font-extrabold">Pemberi</strong> ke @{tx.receiver?.username}
                           </span>
                         ) : (
                           <span>
-                            Kamu sebagai <strong className="text-petrol-800 font-extrabold">Penerima</strong> dari @{tx.giver?.username}
+                            Kamu sebagai <strong className="text-[#E08500] font-extrabold">Penerima</strong> dari @{tx.giver?.username}
                           </span>
                         )}
                       </div>
@@ -138,7 +186,7 @@ export const TransactionsPage = () => {
                   </div>
 
                   <Badge
-                    variant={isCompleted ? 'success' : isReceived ? 'petrol' : 'amber'}
+                    variant={isCompleted ? 'success' : isReceived ? 'primary' : 'amber'}
                     size="md"
                   >
                     {tx.status === 'COMPLETED'
@@ -157,7 +205,7 @@ export const TransactionsPage = () => {
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs ${
                           isArranging
-                            ? 'bg-sage-700 text-white shadow-md shadow-sage-950/15'
+                            ? 'bg-[#2B4E86] text-white shadow-md shadow-[#2B4E86]/20'
                             : 'bg-slate-100 text-slate-400'
                         }`}
                       >
@@ -174,7 +222,7 @@ export const TransactionsPage = () => {
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs ${
                           isReceived
-                            ? 'bg-sage-700 text-white shadow-md shadow-sage-950/15'
+                            ? 'bg-[#2B4E86] text-white shadow-md shadow-[#2B4E86]/20'
                             : 'bg-slate-100 text-slate-400'
                         }`}
                       >
@@ -206,7 +254,7 @@ export const TransactionsPage = () => {
                 </div>
 
                 {/* Details & Action Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-100 bg-slate-50 p-4 rounded-2xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-100 bg-[#F0F5FD] p-4 sm:p-5 rounded-2xl">
                   <div className="text-xs text-slate-600 space-y-1 font-medium">
                     <div>
                       📍 Lokasi Barang:{' '}
@@ -236,10 +284,10 @@ export const TransactionsPage = () => {
                     {/* Receiver Action Buttons */}
                     {isReceiver && tx.status === 'ARRANGING_PICKUP' && (
                       <Button
-                        variant="sage"
+                        variant="primary"
                         size="sm"
                         isLoading={actionLoading}
-                        onClick={() => handleMarkReceived(tx.id)}
+                        onClick={() => handleMarkReceived(tx)}
                         leftIcon={<Truck className="w-3.5 h-3.5" />}
                         className="font-extrabold"
                       >
@@ -249,12 +297,12 @@ export const TransactionsPage = () => {
 
                     {isReceiver && tx.status === 'RECEIVED' && (
                       <Button
-                        variant="gradient"
+                        variant="action"
                         size="sm"
                         isLoading={actionLoading}
-                        onClick={() => handleConfirmCompletion(tx.id)}
+                        onClick={() => handleConfirmCompletion(tx)}
                         leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
-                        className="font-extrabold"
+                        className="font-extrabold shadow-md shadow-[#E08500]/20"
                       >
                         Konfirmasi Selesai
                       </Button>

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   User,
   Save,
+  CheckCircle2,
 } from 'lucide-react';
 import { userApi } from '../api/userApi';
 import { useAuth } from '../context/AuthContext';
@@ -9,6 +10,7 @@ import { useToast } from '../context/ToastContext';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { Spinner } from '../components/common/Loading';
+import { ConfirmModal } from '../components/common/ConfirmModal';
 
 export const ProfilePage = () => {
   const { user, refreshUser } = useAuth();
@@ -22,29 +24,45 @@ export const ProfilePage = () => {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    let cancelled = false;
+
+    (async () => {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         const data = await userApi.getMe();
-        setFormData({
-          fullName: data.fullName || '',
-          phoneNumber: data.phoneNumber || '',
-          email: data.email || '',
-        });
-      } catch (err) {
-        toast.error('Gagal memuat profil pengguna.');
+        if (!cancelled) {
+          setFormData({
+            fullName: data.fullName || '',
+            phoneNumber: data.phoneNumber || '',
+            email: data.email || '',
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          toast.error('Gagal memuat profil pengguna.');
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
+    })();
+
+    return () => {
+      cancelled = true;
     };
+  }, [toast]);
 
-    fetchProfile();
-  }, []);
-
-  const handleSubmit = async (e) => {
+  const handlePreSubmit = (e) => {
     e.preventDefault();
+    setShowConfirmModal(true);
+  };
+
+  const executeSaveProfile = async () => {
     try {
       setSaving(true);
       await userApi.updateProfile({
@@ -53,9 +71,11 @@ export const ProfilePage = () => {
         email: formData.email.trim(),
       });
       await refreshUser();
+      setShowConfirmModal(false);
       toast.success('Profil berhasil diperbarui! ✨');
     } catch (err) {
       toast.error(err.message || 'Gagal memperbarui profil.');
+      setShowConfirmModal(false);
     } finally {
       setSaving(false);
     }
@@ -70,10 +90,10 @@ export const ProfilePage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
       {/* Header Profile Hero */}
-      <div className="bg-gradient-to-r from-sage-50 via-white to-petrol-50 p-6 sm:p-8 rounded-[2.5rem] border-2 border-sage-200 shadow-xs flex flex-col sm:flex-row items-center gap-6">
-        <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-sage-700 via-sage-600 to-petrol-700 text-white flex items-center justify-center font-black text-3xl shadow-md shadow-sage-950/15 shrink-0">
+      <div className="bg-gradient-to-r from-[#F0F5FD] via-white to-[#E8F2FE] p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-[#CFE4FD] shadow-xs flex flex-col sm:flex-row items-center gap-6">
+        <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-[#2B4E86] via-[#223F6E] to-[#15253F] text-white flex items-center justify-center font-black text-3xl shadow-md shadow-[#2B4E86]/20 shrink-0">
           {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
         </div>
         <div className="text-center sm:text-left space-y-1.5">
@@ -81,7 +101,7 @@ export const ProfilePage = () => {
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
               @{user?.username}
             </h1>
-            <Badge variant={user?.role === 'ADMIN' ? 'amber' : 'sage'} size="sm">
+            <Badge variant={user?.role === 'ADMIN' ? 'amber' : 'primary'} size="sm">
               {user?.role === 'ADMIN' ? '⭐ Admin Komunitas' : '🌱 Warga BagiPakai'}
             </Badge>
           </div>
@@ -92,14 +112,14 @@ export const ProfilePage = () => {
       </div>
 
       {/* Edit Form */}
-      <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border-2 border-sage-100 shadow-sm space-y-6">
+      <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border-2 border-[#CFE4FD] shadow-sm space-y-6">
         <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-          <User className="w-5 h-5 text-sage-700" />
+          <User className="w-5 h-5 text-[#2B4E86]" />
           <span>Informasi Akun & Kontak</span>
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <form onSubmit={handlePreSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                 Nama Lengkap
@@ -109,7 +129,7 @@ export const ProfilePage = () => {
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 placeholder="Masukkan nama lengkap..."
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 font-semibold"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 font-semibold"
               />
             </div>
 
@@ -122,7 +142,7 @@ export const ProfilePage = () => {
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                 placeholder="Contoh: 08123456789"
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 font-semibold"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 font-semibold"
               />
             </div>
 
@@ -135,7 +155,7 @@ export const ProfilePage = () => {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="contoh@email.com"
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 font-semibold"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 font-semibold"
               />
             </div>
           </div>
@@ -143,17 +163,31 @@ export const ProfilePage = () => {
           <div className="flex items-center justify-end pt-4 border-t border-slate-100">
             <Button
               type="submit"
-              variant="gradient"
+              variant="primary"
               size="md"
               isLoading={saving}
               leftIcon={<Save className="w-4 h-4" />}
-              className="font-extrabold shadow-xs"
+              className="font-extrabold shadow-md shadow-[#2B4E86]/20"
             >
               Simpan Profil
             </Button>
           </div>
         </form>
       </div>
+
+      {/* Save Profile Confirm Modal */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={executeSaveProfile}
+        title="Simpan Perubahan Profil?"
+        message="Apakah Anda yakin ingin menyimpan perubahan data profil Anda?"
+        confirmText="Ya, Simpan Profil"
+        cancelText="Batal"
+        variant="primary"
+        isLoading={saving}
+        icon={<CheckCircle2 className="w-6 h-6 text-[#2B4E86]" />}
+      />
     </div>
   );
 };

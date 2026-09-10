@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   MessageSquare,
@@ -47,9 +47,10 @@ export const ChatPage = () => {
     }
   };
 
-  useEffect(() => {
-    loadConversations(conversationIdParam);
-  }, [conversationIdParam]);
+useEffect(() => {
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch awal saat mount/param berubah
+  loadConversations(conversationIdParam);
+}, [conversationIdParam]);
 
   // Load messages for active conversation
   const loadMessages = async (convId) => {
@@ -62,12 +63,13 @@ export const ChatPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (activeConversation?.id) {
-      loadMessages(activeConversation.id);
+useEffect(() => {
+  if (activeConversation?.id) {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch pesan saat percakapan aktif berubah
+    loadMessages(activeConversation.id);
 
-      // Periodic check for new messages
-      const interval = setInterval(() => {
+    // Periodic check for new messages
+    const interval = setInterval(() => {
         loadMessages(activeConversation.id);
       }, 5000);
       return () => clearInterval(interval);
@@ -102,14 +104,14 @@ export const ChatPage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className="bg-white rounded-[2.5rem] border-2 border-sage-200 shadow-xl shadow-sage-950/5 overflow-hidden h-[78vh] flex flex-col md:flex-row">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] border-2 border-[#CFE4FD] shadow-xl shadow-[#2B4E86]/5 overflow-hidden h-[78vh] flex flex-col md:flex-row">
         {/* LEFT PANE: Conversation List */}
         <div className={`w-full md:w-80 lg:w-96 border-r-2 border-slate-100 flex flex-col ${activeConversation && 'hidden md:flex'}`}>
           {/* Header */}
-          <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-sage-50 via-white to-petrol-50">
+          <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-[#F0F5FD] via-white to-[#E8F2FE]">
             <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-sage-700" />
+              <MessageSquare className="w-5 h-5 text-[#2B4E86]" />
               <span>Pesan Komunitas</span>
             </h2>
             <p className="text-xs text-slate-500 mt-0.5 font-medium">
@@ -137,11 +139,11 @@ export const ChatPage = () => {
                     onClick={() => setActiveConversation(conv)}
                     className={`w-full text-left p-4 transition-all flex items-start gap-3.5 cursor-pointer ${
                       isSelected
-                        ? 'bg-sage-50/90 border-l-4 border-sage-700'
+                        ? 'bg-[#E8F2FE] border-l-4 border-[#2B4E86]'
                         : 'hover:bg-slate-50'
                     }`}
                   >
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sage-700 to-petrol-700 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
+                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#2B4E86] to-[#15253F] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
                       {partner?.username?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -156,7 +158,7 @@ export const ChatPage = () => {
                           )}
                         </span>
                       </div>
-                      <p className="text-xs text-sage-800 font-bold truncate mt-0.5">
+                      <p className="text-xs text-[#2B4E86] font-bold truncate mt-0.5">
                         📦 {conv.item?.namaBarang || 'Barang'}
                       </p>
                     </div>
@@ -168,7 +170,7 @@ export const ChatPage = () => {
         </div>
 
         {/* RIGHT PANE: Chat History & Input */}
-        <div className={`flex-1 flex flex-col bg-slate-50/50 ${!activeConversation && 'hidden md:flex'}`}>
+        <div className={`flex-1 flex flex-col bg-[#F7F9FC] ${!activeConversation && 'hidden md:flex'}`}>
           {activeConversation ? (
             <>
               {/* Chat Header with Item info */}
@@ -176,7 +178,7 @@ export const ChatPage = () => {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setActiveConversation(null)}
-                    className="p-1.5 rounded-xl hover:bg-slate-100 md:hidden text-slate-700"
+                    className="p-1.5 rounded-xl hover:bg-slate-100 md:hidden text-slate-700 cursor-pointer"
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
@@ -190,7 +192,7 @@ export const ChatPage = () => {
                       <span>Barang:</span>
                       <Link
                         to={`/items/${activeConversation.item?.id}`}
-                        className="text-sage-800 font-bold hover:underline"
+                        className="text-[#2B4E86] font-bold hover:underline"
                       >
                         {activeConversation.item?.namaBarang}
                       </Link>
@@ -200,7 +202,7 @@ export const ChatPage = () => {
 
                 <Link
                   to="/transactions"
-                  className="px-3.5 py-1.5 rounded-xl bg-sage-50 text-sage-800 hover:bg-sage-100 text-xs font-extrabold border-2 border-sage-200 transition-colors"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#E8F2FE] text-[#2B4E86] hover:bg-[#CFE4FD] text-xs font-extrabold border-2 border-[#CFE4FD] transition-colors"
                 >
                   Lihat Serah Terima →
                 </Link>
@@ -223,7 +225,7 @@ export const ChatPage = () => {
                         <div
                           className={`max-w-md rounded-2xl px-4.5 py-3 text-sm shadow-xs ${
                             isMe
-                              ? 'bg-sage-700 text-white rounded-tr-xs font-medium'
+                              ? 'bg-[#2B4E86] text-white rounded-tr-xs font-medium'
                               : 'bg-white border-2 border-slate-200 text-slate-900 rounded-tl-xs font-medium'
                           }`}
                         >
@@ -243,7 +245,7 @@ export const ChatPage = () => {
               </div>
 
               {/* Quick Reply Chips */}
-              <div className="px-4 py-2 bg-white/80 border-t border-slate-100 flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar">
+              <div className="px-4 py-2 bg-white/90 border-t border-slate-100 flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar">
                 {[
                   'Halo kak, kapan kira-kira bisa diambil?',
                   'Lokasi penjemputan sudah sesuai ya kak?',
@@ -254,7 +256,7 @@ export const ChatPage = () => {
                     key={idx}
                     type="button"
                     onClick={() => handleQuickReply(quickText)}
-                    className="shrink-0 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-sage-100 hover:text-sage-900 text-[11px] font-bold text-slate-700 transition-colors cursor-pointer border border-slate-200"
+                    className="shrink-0 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-[#E8F2FE] hover:text-[#2B4E86] text-[11px] font-bold text-slate-700 transition-colors cursor-pointer border border-slate-200"
                   >
                     {quickText}
                   </button>
@@ -271,11 +273,11 @@ export const ChatPage = () => {
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder="Ketik pesan santun..."
-                  className="flex-1 px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 outline-none text-sm text-slate-900 font-medium"
+                  className="flex-1 px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 outline-none text-sm text-slate-900 font-medium"
                 />
                 <Button
                   type="submit"
-                  variant="sage"
+                  variant="primary"
                   size="md"
                   disabled={!messageInput.trim() || sending}
                   isLoading={sending}

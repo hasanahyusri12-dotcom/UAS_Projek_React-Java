@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bell,
@@ -18,22 +18,33 @@ export const NotificationsPage = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  const loadNotifications = async () => {
-    try {
-      setLoading(true);
-      const data = await notificationsApi.getAll();
-      setNotifications(data || []);
-      refreshUnread();
-    } catch (err) {
-      toast.error('Gagal memuat notifikasi.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadNotifications();
-  }, []);
+    let cancelled = false;
+
+    (async () => {
+      try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setLoading(true);
+        const data = await notificationsApi.getAll();
+        if (!cancelled) {
+          setNotifications(data || []);
+          refreshUnread();
+        }
+      } catch {
+        if (!cancelled) {
+          toast.error('Gagal memuat notifikasi.');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshUnread, toast]);
 
   const handleMarkAsRead = async (notif) => {
     if (!notif.read) {
@@ -61,11 +72,11 @@ export const NotificationsPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      <div className="bg-gradient-to-r from-sage-50 via-white to-petrol-50 p-6 sm:p-8 rounded-[2.5rem] border-2 border-sage-200 shadow-xs flex items-center justify-between">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+      <div className="bg-gradient-to-r from-[#F0F5FD] via-white to-[#E8F2FE] p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-[#CFE4FD] shadow-xs flex items-center justify-between">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sage-100 text-sage-900 text-xs font-extrabold mb-2">
-            <Bell className="w-3.5 h-3.5 text-sage-700" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E8F2FE] text-[#2B4E86] text-xs font-extrabold mb-2 border border-[#CFE4FD]">
+            <Bell className="w-3.5 h-3.5 text-[#E08500]" />
             <span>Pusat Notifikasi</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
@@ -81,7 +92,7 @@ export const NotificationsPage = () => {
         <Spinner text="Memuat notifikasi..." />
       ) : notifications.length === 0 ? (
         <EmptyState
-          icon={<Bell className="w-10 h-10 text-sage-600" />}
+          icon={<Bell className="w-10 h-10 text-[#2B4E86]" />}
           title="Belum Ada Notifikasi"
           description="Kamu akan menerima pemberitahuan di sini saat ada pemohon barang, pesan baru, atau update klaim."
         />
@@ -93,14 +104,14 @@ export const NotificationsPage = () => {
               onClick={() => handleMarkAsRead(notif)}
               className={`p-4 sm:p-5 rounded-3xl border-2 transition-all cursor-pointer flex items-start gap-4 ${
                 !notif.read
-                  ? 'bg-sage-50/70 border-sage-300 shadow-xs hover:border-sage-400'
+                  ? 'bg-[#F0F5FD]/70 border-[#CFE4FD] shadow-xs hover:border-[#2B4E86]'
                   : 'bg-white border-slate-200 opacity-80 hover:opacity-100 hover:border-slate-300'
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
                   !notif.read
-                    ? 'bg-sage-700 text-white shadow-xs'
+                    ? 'bg-[#2B4E86] text-white shadow-xs'
                     : 'bg-slate-100 text-slate-500'
                 }`}
               >
@@ -129,7 +140,7 @@ export const NotificationsPage = () => {
               </div>
 
               {!notif.read && (
-                <div className="w-2.5 h-2.5 rounded-full bg-sage-600 mt-2 shrink-0 animate-pulse" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#E08500] mt-2 shrink-0 animate-pulse" />
               )}
             </div>
           ))}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Sparkles, User, Gift, ArrowRight } from 'lucide-react';
 import { Badge } from '../common/Badge';
+import { getImageUrl } from '../../utils/imageUrl';
 
 export const ItemCard = ({ item }) => {
   const [imageError, setImageError] = useState(false);
@@ -20,15 +21,16 @@ export const ItemCard = ({ item }) => {
   };
 
   const isAvailable = item.status === 'TERSEDIA';
+  const resolvedImageUrl = getImageUrl(item.fotoUrl);
 
   return (
     <div className="group bg-white rounded-3xl p-3.5 border-2 border-[#E1ECFC] hover:border-[#2B4E86] shadow-xs hover-lift flex flex-col justify-between h-full transition-all duration-300">
       <div>
         {/* Image Container with Badges */}
         <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-[#F0F5FD] to-[#E8F2FE] mb-3.5 border border-slate-100">
-          {item.fotoUrl && !imageError ? (
+          {resolvedImageUrl && !imageError ? (
             <img
-              src={item.fotoUrl}
+              src={resolvedImageUrl}
               alt={item.namaBarang}
               onError={() => setImageError(true)}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

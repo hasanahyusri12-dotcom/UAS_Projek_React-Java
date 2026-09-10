@@ -1,39 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate} from 'react-router-dom';
 import {
   Search,
   PlusCircle,
   Leaf,
   Gift,
-  MapPin,
   Sparkles,
   ChevronRight,
   ShieldCheck,
   Package,
   ChevronDown,
-  ArrowRight,
   Lock,
   Heart,
   Users,
   CheckCircle2,
-  HelpCircle,
-  Truck,
-  RotateCcw,
 } from 'lucide-react';
 import { itemsApi } from '../api/itemsApi';
-import { useAuth } from '../context/AuthContext';
 import { ItemGrid } from '../components/items/ItemGrid';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 
 export const HomePage = () => {
-  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  // If already logged in, redirect straight to explore items as default
-  if (isAuthenticated) {
-    return <Navigate to="/items" replace />;
-  }
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +29,6 @@ export const HomePage = () => {
   const [ecoItemsCount, setEcoItemsCount] = useState(3);
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
-  // Real Platform Stats fetched from backend
   const [stats, setStats] = useState({
     totalAvailable: 0,
     totalShared: 0,

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { notificationsApi } from '../api/notificationsApi';
 import { useAuth } from './AuthContext';
 
@@ -22,7 +22,9 @@ export const NotificationProvider = ({ children }) => {
   }, [isAuthenticated]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchUnread();
+
     if (!isAuthenticated) return;
 
     // Periodic check every 30 seconds
@@ -37,6 +39,7 @@ export const NotificationProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useNotifications = () => {
   const context = useContext(NotificationContext);
   if (!context) {

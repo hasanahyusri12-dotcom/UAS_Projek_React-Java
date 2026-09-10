@@ -12,25 +12,25 @@ import {
   Trash2,
   Gift,
   AlertCircle,
-  Lock,
-  User,
-  CheckCircle2,
 } from 'lucide-react';
 import { itemsApi } from '../api/itemsApi';
 import { chatApi } from '../api/chatApi';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 import { ClaimModal } from '../components/claims/ClaimModal';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { Spinner } from '../components/common/Loading';
 import { ItemCard } from '../components/items/ItemCard';
+import { getImageUrl } from '../utils/imageUrl';
 
 export const ItemDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const toast = useToast();
+  const { confirm } = useConfirm();
 
   const [item, setItem] = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
@@ -44,11 +44,12 @@ export const ItemDetailPage = () => {
   useEffect(() => {
     let cancelled = false;
 
-    setLoading(true);
-    setError('');
-    setImageError(false);
-
     (async () => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLoading(true);
+      setError('');
+      setImageError(false);
+
       try {
         const data = await itemsApi.getItemById(id);
         if (cancelled) return;
@@ -84,7 +85,16 @@ export const ItemDetailPage = () => {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm('Apakah kamu yakin ingin menghapus barang ini?')) return;
+    const ok = await confirm({
+      title: 'Hapus Barang Secara Permanen?',
+      message: `Apakah kamu yakin ingin menghapus barang "${item?.namaBarang}"? Tindakan ini tidak dapat dibatalkan.`,
+      confirmText: 'Ya, Hapus Barang',
+      cancelText: 'Batal',
+      variant: 'danger',
+      icon: <Trash2 className="w-6 h-6 text-rose-600" />,
+    });
+
+    if (!ok) return;
 
     try {
       setDeleting(true);
@@ -145,7 +155,7 @@ export const ItemDetailPage = () => {
         <p className="text-sm text-slate-500">
           {error || 'Barang yang kamu cari mungkin sudah dihapus atau tidak tersedia.'}
         </p>
-        <Button variant="sage" onClick={() => navigate('/items')}>
+        <Button variant="primary" onClick={() => navigate('/items')}>
           Kembali ke Katalog
         </Button>
       </div>
@@ -155,32 +165,34 @@ export const ItemDetailPage = () => {
   const isOwner = user?.username && user.username === item.ownerUsername;
   const isAvailable = item.status === 'TERSEDIA';
 
+  const resolvedImageUrl = getImageUrl(item.fotoUrl);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-10">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 hover:text-sage-800 transition-colors cursor-pointer"
+        className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 hover:text-[#2B4E86] transition-colors cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Kembali</span>
       </button>
 
       {/* Main Grid: Photo & Info */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
         {/* Left Col: Photo Display (7 Cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-sage-50 to-petrol-50 border-2 border-sage-200 shadow-md">
-            {item.fotoUrl && !imageError ? (
+          <div className="relative aspect-[4/3] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-[#F0F5FD] to-[#E8F2FE] border-2 border-[#CFE4FD] shadow-md">
+            {resolvedImageUrl && !imageError ? (
               <img
-                src={item.fotoUrl}
+                src={resolvedImageUrl}
                 alt={item.namaBarang}
                 onError={() => setImageError(true)}
                 className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-                <div className="w-20 h-20 rounded-3xl bg-white text-sage-700 flex items-center justify-center shadow-md mb-3 border border-sage-200">
+                <div className="w-20 h-20 rounded-3xl bg-white text-[#2B4E86] flex items-center justify-center shadow-md mb-3 border border-[#CFE4FD]">
                   <Gift className="w-10 h-10" />
                 </div>
                 <p className="text-sm font-black text-slate-600">BagiPakai Indonesia</p>
@@ -193,9 +205,9 @@ export const ItemDetailPage = () => {
               <Badge
                 variant={
                   item.status === 'TERSEDIA'
-                    ? 'sage'
+                    ? 'primary'
                     : item.status === 'DIPILIH'
-                    ? 'petrol'
+                    ? 'lightblue'
                     : item.status === 'SELESAI'
                     ? 'neutral'
                     : 'amber'
@@ -211,15 +223,15 @@ export const ItemDetailPage = () => {
 
         {/* Right Col: Info & Action Card (5 Cols) */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border-2 border-sage-100 shadow-sm space-y-6">
+          <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-2 border-[#CFE4FD] shadow-sm space-y-6">
             {/* Category & Actions */}
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-sage-100 text-sage-900 border border-sage-200">
+              <span className="text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-[#E8F2FE] text-[#2B4E86] border border-[#CFE4FD]">
                 {item.kategori || 'Kategori Umum'}
               </span>
               <button
                 onClick={handleShare}
-                className="p-2 rounded-2xl text-slate-500 hover:text-sage-800 hover:bg-sage-50 transition-colors cursor-pointer border border-slate-200"
+                className="p-2 rounded-2xl text-slate-500 hover:text-[#2B4E86] hover:bg-[#F0F5FD] transition-colors cursor-pointer border border-slate-200"
                 title="Bagikan Tautan"
               >
                 <Share2 className="w-4 h-4" />
@@ -232,15 +244,15 @@ export const ItemDetailPage = () => {
                 {item.namaBarang}
               </h1>
               <div className="flex items-center gap-1.5 text-sm text-slate-600 font-semibold">
-                <MapPin className="w-4 h-4 text-sage-600 shrink-0" />
+                <MapPin className="w-4 h-4 text-[#2B4E86] shrink-0" />
                 <span>{item.lokasi || 'Lokasi belum ditentukan'}</span>
               </div>
             </div>
 
             {/* Owner Profile Card */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-sage-50 to-petrol-50 border-2 border-sage-200/80 flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-[#F0F5FD] to-[#E8F2FE] border-2 border-[#CFE4FD] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sage-700 to-petrol-700 text-white flex items-center justify-center font-black text-sm shadow-xs">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#2B4E86] to-[#15253F] text-white flex items-center justify-center font-black text-sm shadow-xs">
                   {item.ownerUsername ? item.ownerUsername.charAt(0).toUpperCase() : 'U'}
                 </div>
                 <div>
@@ -248,7 +260,7 @@ export const ItemDetailPage = () => {
                   <div className="text-sm font-black text-slate-900">@{item.ownerUsername}</div>
                 </div>
               </div>
-              <Badge variant="sage" size="sm">
+              <Badge variant="primary" size="sm">
                 🌱 Donatur
               </Badge>
             </div>
@@ -257,13 +269,13 @@ export const ItemDetailPage = () => {
             <div className="space-y-3 pt-2">
               {isOwner ? (
                 <div className="space-y-2.5">
-                  <div className="p-3 rounded-2xl bg-sage-50 border border-sage-200 text-sage-900 text-xs font-semibold">
+                  <div className="p-3 rounded-2xl bg-[#F0F5FD] border border-[#CFE4FD] text-[#2B4E86] text-xs font-semibold">
                     Ini adalah barang yang kamu bagikan. Kamu bisa melihat calon pemohon atau mengubah informasi barang.
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <Link
                       to={`/edit-item/${item.id}`}
-                      className="flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-sage-300 text-sage-900 font-bold text-sm hover:bg-sage-50 transition-colors"
+                      className="flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-[#CFE4FD] text-[#2B4E86] font-bold text-sm hover:bg-[#F0F5FD] transition-colors"
                     >
                       <Edit className="w-4 h-4" />
                       <span>Edit Barang</span>
@@ -279,7 +291,7 @@ export const ItemDetailPage = () => {
                   </div>
                   <Link
                     to="/my-items"
-                    className="block text-center w-full py-3 rounded-2xl bg-sage-700 text-white font-extrabold text-sm shadow-md hover:bg-sage-800 transition-colors"
+                    className="block text-center w-full py-3 rounded-2xl bg-[#2B4E86] text-white font-extrabold text-sm shadow-md hover:bg-[#1f3760] transition-colors"
                   >
                     Buka Calon Penerima di Dashboard
                   </Link>
@@ -288,9 +300,9 @@ export const ItemDetailPage = () => {
                 <>
                   {isAvailable ? (
                     <Button
-                      variant="gradient"
+                      variant="action"
                       size="lg"
-                      className="w-full shadow-lg shadow-sage-950/15 font-extrabold"
+                      className="w-full shadow-lg shadow-[#E08500]/20 font-extrabold"
                       onClick={() => setClaimModalOpen(true)}
                       leftIcon={<Heart className="w-5 h-5" />}
                     >
@@ -315,9 +327,9 @@ export const ItemDetailPage = () => {
               ) : (
                 <div className="space-y-3">
                   <Button
-                    variant="gradient"
+                    variant="action"
                     size="lg"
-                    className="w-full font-extrabold shadow-md shadow-sage-950/10"
+                    className="w-full font-extrabold shadow-md shadow-[#E08500]/20"
                     onClick={() => navigate('/login', { state: { from: `/items/${item.id}` } })}
                     leftIcon={<Heart className="w-5 h-5" />}
                   >
@@ -325,7 +337,7 @@ export const ItemDetailPage = () => {
                   </Button>
                   <p className="text-center text-xs text-slate-500 font-medium">
                     Belum punya akun?{' '}
-                    <Link to="/register" className="text-sage-800 font-bold underline">
+                    <Link to="/register" className="text-[#2B4E86] font-bold underline">
                       Daftar Gratis Sekarang
                     </Link>
                   </p>
@@ -334,12 +346,12 @@ export const ItemDetailPage = () => {
             </div>
 
             {/* Safety Reminder */}
-            <div className="p-4 rounded-2xl bg-sage-50/80 border-2 border-sage-200 text-xs text-slate-700 space-y-1.5">
-              <div className="flex items-center gap-1.5 font-extrabold text-sage-900">
-                <ShieldCheck className="w-4 h-4 text-sage-700 shrink-0" />
+            <div className="p-4 rounded-2xl bg-[#F0F5FD] border-2 border-[#CFE4FD] text-xs text-slate-700 space-y-1.5">
+              <div className="flex items-center gap-1.5 font-extrabold text-[#2B4E86]">
+                <ShieldCheck className="w-4 h-4 text-[#2B4E86] shrink-0" />
                 <span>Komitmen Berbagi Aman & Gratis</span>
               </div>
-              <p className="leading-relaxed text-slate-600">
+              <p className="leading-relaxed text-slate-600 font-medium">
                 Seluruh barang di BagiPakai adalah 100% gratis tanpa komisi. Dilarang meminta uang selain ongkir resmi jika kirim via ekspedisi.
               </p>
             </div>
@@ -348,9 +360,9 @@ export const ItemDetailPage = () => {
       </div>
 
       {/* Description Section */}
-      <div className="bg-white rounded-[2.5rem] p-6 sm:p-10 border-2 border-sage-100 shadow-sm space-y-4">
+      <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-10 border-2 border-[#CFE4FD] shadow-sm space-y-4">
         <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-          <Package className="w-5 h-5 text-sage-700" />
+          <Package className="w-5 h-5 text-[#2B4E86]" />
           <span>Deskripsi & Kondisi Barang</span>
         </h2>
         <div className="prose prose-slate max-w-none text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium">
@@ -367,7 +379,7 @@ export const ItemDetailPage = () => {
             </h3>
             <Link
               to={`/items?kategori=${encodeURIComponent(item.kategori)}`}
-              className="text-xs sm:text-sm font-extrabold text-sage-800 hover:text-sage-900"
+              className="text-xs sm:text-sm font-extrabold text-[#2B4E86] hover:text-[#1f3760]"
             >
               Lihat Kategori Ini →
             </Link>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, Sparkles, SlidersHorizontal, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { itemsApi } from '../api/itemsApi';
@@ -71,12 +71,12 @@ export const ExplorePage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-sage-50 via-white to-petrol-50 rounded-3xl p-6 sm:p-8 border-2 border-sage-200 shadow-xs">
+      <div className="bg-gradient-to-r from-[#F0F5FD] via-white to-[#E8F2FE] rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border-2 border-[#CFE4FD] shadow-xs">
         <div className="max-w-2xl space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sage-100 text-sage-900 text-xs font-extrabold">
-            <Sparkles className="w-3.5 h-3.5 text-sage-700" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E8F2FE] text-[#2B4E86] text-xs font-extrabold border border-[#CFE4FD]">
+            <Sparkles className="w-3.5 h-3.5 text-[#E08500]" />
             <span>Katalog Komunitas Lengkap</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
@@ -89,7 +89,7 @@ export const ExplorePage = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-5 rounded-3xl border-2 border-sage-100 shadow-xs space-y-4">
+      <div className="bg-white p-5 rounded-3xl border-2 border-[#CFE4FD] shadow-xs space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           {/* Keyword Search */}
           <div className="relative md:col-span-2">
@@ -102,7 +102,7 @@ export const ExplorePage = () => {
                 setPage(0);
               }}
               placeholder="Cari nama barang atau deskripsi..."
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 text-sm text-slate-800 outline-none font-medium transition-all"
+              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 text-sm text-slate-800 outline-none font-medium transition-all"
             />
           </div>
 
@@ -114,7 +114,7 @@ export const ExplorePage = () => {
                 setCategory(e.target.value);
                 setPage(0);
               }}
-              className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 text-sm text-slate-800 outline-none bg-white transition-all cursor-pointer font-bold"
+              className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 text-sm text-slate-800 outline-none bg-white transition-all cursor-pointer font-bold"
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat.id || 'all'} value={cat.id}>
@@ -132,7 +132,7 @@ export const ExplorePage = () => {
                 setStatus(e.target.value);
                 setPage(0);
               }}
-              className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-200 focus:border-sage-500 focus:ring-2 focus:ring-sage-200 text-sm text-slate-800 outline-none bg-white transition-all cursor-pointer font-bold"
+              className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-200 focus:border-[#2B4E86] focus:ring-2 focus:ring-[#A5CBFD]/40 text-sm text-slate-800 outline-none bg-white transition-all cursor-pointer font-bold"
             >
               <option value="">Semua Status</option>
               <option value="TERSEDIA">✨ Tersedia Gratis</option>
@@ -145,14 +145,14 @@ export const ExplorePage = () => {
         {/* Filter Summary & Sort Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs text-slate-500 font-semibold">
           <div className="text-slate-700">
-            Menampilkan <span className="text-sage-800 font-extrabold text-sm">{itemsData.totalElements}</span> barang
+            Menampilkan <span className="text-[#2B4E86] font-extrabold text-sm">{itemsData.totalElements}</span> barang
             {(searchQuery || category || status) && ' dengan filter aktif'}
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc')}
-              className="px-3.5 py-1.5 rounded-xl border-2 border-slate-200 hover:border-sage-400 text-slate-700 font-bold flex items-center gap-1.5 transition-colors cursor-pointer bg-white"
+              className="px-3.5 py-1.5 rounded-xl border-2 border-slate-200 hover:border-[#2B4E86] text-slate-700 font-bold flex items-center gap-1.5 transition-colors cursor-pointer bg-white"
             >
               <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
               <span>Urutan: {sortDirection === 'desc' ? 'Terbaru' : 'Terlama'}</span>
