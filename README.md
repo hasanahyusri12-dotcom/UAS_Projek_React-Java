@@ -2,10 +2,9 @@
 
 > Proyek Akhir Pelatihan Full-Stack Web Development: React JS & Java Spring Boot
 
-**Peserta:** Albian Maulana
+**Peserta:** Yusri Hasanah
 **Repo:** [github.com/hasanahyusri12-dotcom/UAS_Projek_React-Java](https://github.com/hasanahyusri12-dotcom/UAS_Projek_React-Java)
-
----
+**Video Demo:** [Google Drive](https://drive.google.com/drive/folders/185islVENv3TtO8YOyN8vV__KBXJfJGjg?hl=ID)---
 
 ## Tentang Proyek Ini
 
